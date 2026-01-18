@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Package, Clock, Play, Pause, Trash2 } from 'lucide-react';
+import { Plus, Package, Pause, Trash2 } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
 import { AuctionItem } from '../types/auction';
