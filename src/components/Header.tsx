@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { User, LogOut, Settings, Zap, ShoppingCart, Gavel, Shield, Menu, X } from 'lucide-react';
+import { User, LogOut, Settings, Zap, ShoppingCart, Gavel, Shield, Menu, X, Trophy } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -50,6 +50,12 @@ export const Header: React.FC = () => {
                 label={t('nav.buyCredits')}
                 onClick={() => navigate('/buy-credits')}
                 active={isActive('/buy-credits')}
+              />
+              <NavButton
+                icon={<Trophy className="w-4 h-4" />}
+                label={t('nav.rankings')}
+                onClick={() => navigate('/rankings')}
+                active={isActive('/rankings')}
               />
               <NavButton
                 icon={<Settings className="w-4 h-4" />}
@@ -196,6 +202,15 @@ export const Header: React.FC = () => {
                 setMobileMenuOpen(false);
               }}
               active={isActive('/buy-credits')}
+            />
+            <MobileNavButton
+              icon={<Trophy className="w-5 h-5" />}
+              label={t('nav.rankings')}
+              onClick={() => {
+                navigate('/rankings');
+                setMobileMenuOpen(false);
+              }}
+              active={isActive('/rankings')}
             />
             <MobileNavButton
               icon={<Settings className="w-5 h-5" />}

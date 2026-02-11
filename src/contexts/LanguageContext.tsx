@@ -71,6 +71,14 @@ const translations: Translations = {
   'settings.title': { en: 'Settings', pt: 'Configurações', ja: '設定' },
   'settings.language': { en: 'Language', pt: 'Idioma', ja: '言語' },
   'settings.account': { en: 'Account Information', pt: 'Informações da Conta', ja: 'アカウント情報' },
+  
+  // Rankings
+  'nav.rankings': { en: 'Rankings', pt: 'Rankings', ja: 'ランキング' },
+  'rankings.title': { en: 'Top Winners', pt: 'Melhores Vencedores', ja: 'トップ入札者' },
+  'rankings.subtitle': { en: 'Hall of Champions', pt: 'Hall dos Campeões', ja: 'チャンピオンホール' },
+  'rankings.auctionsWon': { en: 'auctions won', pt: 'leilões ganhos', ja: '落札数' },
+  'rankings.totalBids': { en: 'total bids', pt: 'lances totais', ja: '総入札数' },
+  'rankings.position': { en: 'Position', pt: 'Posição', ja: '順位' },
 };
 
 interface LanguageContextType {

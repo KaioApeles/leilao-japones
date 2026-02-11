@@ -9,6 +9,7 @@ import { MyBids } from './pages/MyBids';
 import { BuyCredits } from './pages/BuyCredits';
 import { Settings } from './pages/Settings';
 import { Admin } from './pages/Admin';  
+import { Rankings } from './pages/Rankings';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
@@ -66,6 +67,14 @@ function AppContent() {
             <AdminRoute>
               <Admin />
             </AdminRoute>
+          }
+        />
+        <Route
+          path="/rankings"
+          element={
+            <ProtectedRoute>
+              <Rankings />
+            </ProtectedRoute>
           }
         />
       </Routes>
