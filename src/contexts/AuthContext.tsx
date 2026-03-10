@@ -17,6 +17,7 @@ interface AuthContextType {
   logout: () => void;
   register: (username: string, email: string, password: string) => Promise<void>;
   updateCredits: (amount: number) => void;
+  syncCredits: (credits: number) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -220,6 +221,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
+  const syncCredits = (credits: number) => {
+    setUser((currentUser) => {
+      if (!currentUser) return currentUser;
+      return {
+        ...currentUser,
+        credits,
+      };
+    });
+  };
+
   const value = useMemo(
     () => ({
       user,
@@ -229,6 +240,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       logout,
       register,
       updateCredits,
+      syncCredits,
     }),
     [user, isAuthReady, isMockSession]
   );

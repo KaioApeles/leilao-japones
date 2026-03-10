@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Trophy, Medal, Zap, TrendingUp } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -6,9 +6,18 @@ import { useLanguage } from '../contexts/LanguageContext';
 interface RankingPlayer {
   position: number;
   username: string;
-  auctionsWon: number;
-  totalBids: number;
+  auctionsWon?: number;
+  totalBids?: number;
   avatar?: string;
+}
+
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api/v1.0';
+
+interface RankingsResponse {
+  ok: true;
+  data: {
+    rankings: RankingPlayer[];
+  };
 }
 
 // Mock data for rankings
@@ -27,6 +36,42 @@ const mockRankings: RankingPlayer[] = [
 
 export const Rankings: React.FC = () => {
   const { t } = useLanguage();
+  const [rankings, setRankings] = useState<RankingPlayer[]>(mockRankings);
+
+  const normalizeUsername = (value: string | undefined, index: number) => {
+    const normalized = value?.trim();
+    if (!normalized) return `Player ${index + 1}`;
+    return normalized;
+  };
+
+  useEffect(() => {
+    const loadRankings = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/auction/rankings`);
+        if (!response.ok) throw new Error('Unable to load rankings');
+
+        const payload = (await response.json()) as RankingsResponse;
+        if (!payload.data.rankings.length) {
+          setRankings(mockRankings);
+          return;
+        }
+
+        setRankings(
+          payload.data.rankings.map((player, index) => ({
+            position: player.position ?? index + 1,
+            username: normalizeUsername(player.username, index),
+            auctionsWon: player.auctionsWon ?? 0,
+            totalBids: player.totalBids ?? 0,
+          }))
+        );
+      } catch (error) {
+        console.error('Failed to load rankings', error);
+        setRankings(mockRankings);
+      }
+    };
+
+    void loadRankings();
+  }, []);
 
   const getMedalColor = (position: number) => {
     if (position === 1) return 'from-yellow-400 to-yellow-600';
@@ -50,14 +95,24 @@ export const Rankings: React.FC = () => {
   };
 
   const renderTopThree = () => {
-    const top3 = mockRankings.slice(0, 3);
-    const order = [top3[1], top3[0], top3[2]]; // 2nd, 1st, 3rd for podium effect
+    const topPlayers = rankings.slice(0, Math.min(3, rankings.length));
+    if (!topPlayers.length) return null;
+
+    const order = topPlayers.length === 3 ? [topPlayers[1], topPlayers[0], topPlayers[2]] : topPlayers;
 
     return (
-      <div className="flex justify-center items-end gap-2 md:gap-4 mb-8 md:mb-12">
+      <div className="flex justify-center items-end gap-2 md:gap-4 mb-8 md:mb-12 flex-wrap">
         {order.map((player, idx) => {
+          if (!player) return null;
           const actualPosition = player.position;
-          const heightClass = actualPosition === 1 ? 'h-48 md:h-64' : actualPosition === 2 ? 'h-40 md:h-56' : 'h-32 md:h-48';
+          const heightClass =
+            topPlayers.length < 3
+              ? 'h-40 md:h-52'
+              : actualPosition === 1
+                ? 'h-48 md:h-64'
+                : actualPosition === 2
+                  ? 'h-40 md:h-56'
+                  : 'h-32 md:h-48';
           
           return (
             <motion.div
@@ -97,7 +152,7 @@ export const Rankings: React.FC = () => {
                 {/* Stats */}
                 <div className="bg-black/30 rounded-lg px-2 md:px-3 py-1.5 md:py-2 backdrop-blur-sm mb-2">
                   <div className="text-xl md:text-3xl font-black text-white">
-                    {player.auctionsWon}
+                    {player.auctionsWon ?? 0}
                   </div>
                   <div className="text-[10px] md:text-xs text-white/80">
                     {t('rankings.auctionsWon')}
@@ -106,7 +161,7 @@ export const Rankings: React.FC = () => {
 
                 <div className="text-[10px] md:text-xs text-white/70 flex items-center gap-1">
                   <Zap className="w-3 h-3" />
-                  {player.totalBids} {t('rankings.totalBids')}
+                  {player.totalBids ?? 0} {t('rankings.totalBids')}
                 </div>
               </div>
             </motion.div>
@@ -117,7 +172,7 @@ export const Rankings: React.FC = () => {
   };
 
   const renderRemainingRankings = () => {
-    const remaining = mockRankings.slice(3);
+    const remaining = rankings.slice(Math.min(3, rankings.length));
 
     return (
       <div className="space-y-3 md:space-y-4">
@@ -148,12 +203,12 @@ export const Rankings: React.FC = () => {
                 <div className="flex items-center gap-3 md:gap-4 text-xs md:text-sm">
                   <div className="flex items-center gap-1 text-green-400">
                     <Trophy className="w-3 h-3 md:w-4 md:h-4" />
-                    <span className="font-bold">{player.auctionsWon}</span>
+                    <span className="font-bold">{player.auctionsWon ?? 0}</span>
                     <span className="text-gray-400 hidden sm:inline">{t('rankings.auctionsWon')}</span>
                   </div>
                   <div className="flex items-center gap-1 text-yellow-400">
                     <Zap className="w-3 h-3 md:w-4 md:h-4" />
-                    <span className="font-bold">{player.totalBids}</span>
+                    <span className="font-bold">{player.totalBids ?? 0}</span>
                     <span className="text-gray-400 hidden sm:inline">{t('rankings.totalBids')}</span>
                   </div>
                 </div>
@@ -162,6 +217,34 @@ export const Rankings: React.FC = () => {
               {/* Trend Icon */}
               <div className="flex-shrink-0 hidden md:block">
                 <TrendingUp className="w-6 h-6 text-pink-400" />
+              </div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    );
+  };
+
+  const renderAllPlayersList = () => {
+    return (
+      <div className="space-y-3 md:space-y-4 mt-8">
+        {rankings.map((player, idx) => (
+          <motion.div
+            key={`${player.position}-${player.username}-${idx}`}
+            initial={{ x: -30, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.2 + idx * 0.08, duration: 0.35 }}
+            className="bg-gradient-to-r from-purple-900/40 to-pink-900/40 rounded-xl border-2 border-purple-500/30 p-4 md:p-5"
+          >
+            <div className="flex items-center gap-3 md:gap-4">
+              <div className="flex-shrink-0 w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center border border-white/20">
+                <span className="text-sm md:text-lg font-black text-white">#{player.position}</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-black text-white truncate">{normalizeUsername(player.username, idx)}</p>
+                <p className="text-xs text-gray-400">
+                  {player.auctionsWon ?? 0} {t('rankings.auctionsWon')} • {player.totalBids ?? 0} {t('rankings.totalBids')}
+                </p>
               </div>
             </div>
           </motion.div>
@@ -191,11 +274,11 @@ export const Rankings: React.FC = () => {
           </p>
         </motion.div>
 
-        {/* Top 3 Podium */}
+        {/* Top Podium */}
         {renderTopThree()}
 
         {/* Remaining Rankings */}
-        {renderRemainingRankings()}
+        {rankings.length > 3 ? renderRemainingRankings() : renderAllPlayersList()}
 
         {/* Decorative elements */}
         <motion.div

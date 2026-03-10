@@ -30,9 +30,21 @@ interface ApiAuctionListResponse {
   };
 }
 
+interface PlaceBidResponse {
+  ok: true;
+  data: {
+    auctionUuid: string;
+    bidUuid: string;
+    currentPrice: number;
+    totalBids: number;
+    remainingCredits: number;
+    bidStatus: 'ACTIVE';
+  };
+}
+
 export const Home: React.FC = () => {
   const { t } = useLanguage();
-  const { user, updateCredits, isMockSession } = useAuth();
+  const { user, updateCredits, syncCredits, isMockSession } = useAuth();
   const [activeAuctions, setActiveAuctions] = useState<AuctionItem[]>(mockActiveAuctions);
   const [upcomingAuctions, setUpcomingAuctions] = useState<AuctionItem[]>(mockUpcomingAuctions);
   const [errorMessage, setErrorMessage] = useState('');
@@ -104,18 +116,21 @@ export const Home: React.FC = () => {
             throw new Error('Failed to place bid');
           }
 
+          const payload = (await response.json()) as PlaceBidResponse;
+
           setActiveAuctions((prev) =>
             prev.map((item) =>
               item.id === itemId
                 ? {
                     ...item,
-                    currentPrice: item.currentPrice + 1,
+                    currentPrice: payload.data.currentPrice,
                     lastBidder: user.username,
-                    bids: item.bids + 1,
+                    bids: payload.data.totalBids,
                   }
                 : item
             )
           );
+          syncCredits(payload.data.remainingCredits);
         } catch (error) {
           console.error('Bid error', error);
           setErrorMessage(t('home.bidError'));
