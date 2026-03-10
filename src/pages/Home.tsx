@@ -8,7 +8,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { mockActiveAuctions, mockUpcomingAuctions } from '../data/mockData';
 import { AuctionItem } from '../types/auction';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3003/api/v1.0';
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api/v1.0';
 const TOKEN_STORAGE_KEY = 'auth_token';
 
 interface ApiAuction {

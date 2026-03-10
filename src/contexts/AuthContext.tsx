@@ -22,7 +22,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const TOKEN_STORAGE_KEY = 'auth_token';
 const MOCK_SESSION_STORAGE_KEY = 'mock_admin_session';
-const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3003/api/v1.0';
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api/v1.0';
 const DEMO_ADMIN_EMAIL = 'admin@admin.com';
 const DEMO_ADMIN_PASSWORD = 'admin';
 
@@ -37,6 +37,7 @@ interface UserPayload {
   uuid: string;
   email: string;
   name: string;
+  admin?: boolean;
   userConfigs?: Array<{
     locale?: string;
   }>;
@@ -61,7 +62,7 @@ const mapApiUserToAuthUser = (apiUser: UserPayload): User => ({
   username: apiUser.name,
   email: apiUser.email,
   credits: 0,
-  isAdmin: false,
+  isAdmin: Boolean(apiUser.admin),
 });
 
 const getApiErrorMessage = (payload: unknown, fallback: string) => {
