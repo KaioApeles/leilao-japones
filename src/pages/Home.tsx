@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
 import { AuctionCard } from '../components/AuctionCard';
@@ -8,14 +8,123 @@ import { useAuth } from '../contexts/AuthContext';
 import { mockActiveAuctions, mockUpcomingAuctions } from '../data/mockData';
 import { AuctionItem } from '../types/auction';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3003/api/v1.0';
+const TOKEN_STORAGE_KEY = 'auth_token';
+
+interface ApiAuction {
+  id: string;
+  name: string;
+  description: string | null;
+  imageUrl: string;
+  currentPrice: number;
+  lastBidder: string | null;
+  endTime: string;
+  status: 'active' | 'upcoming' | 'ended';
+  bids: number;
+}
+
+interface ApiAuctionListResponse {
+  ok: true;
+  data: {
+    auctions: ApiAuction[];
+  };
+}
+
 export const Home: React.FC = () => {
   const { t } = useLanguage();
-  const { user, updateCredits } = useAuth();
+  const { user, updateCredits, isMockSession } = useAuth();
   const [activeAuctions, setActiveAuctions] = useState<AuctionItem[]>(mockActiveAuctions);
-  const [upcomingAuctions] = useState<AuctionItem[]>(mockUpcomingAuctions);
+  const [upcomingAuctions, setUpcomingAuctions] = useState<AuctionItem[]>(mockUpcomingAuctions);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const mapApiAuctionToItem = (auction: ApiAuction): AuctionItem => ({
+    id: auction.id,
+    name: auction.name,
+    description: auction.description ?? '',
+    imageUrl: auction.imageUrl,
+    currentPrice: auction.currentPrice,
+    lastBidder: auction.lastBidder,
+    endTime: new Date(auction.endTime),
+    status: auction.status,
+    bids: auction.bids,
+  });
+
+  useEffect(() => {
+    if (!user) return;
+    if (isMockSession) {
+      setActiveAuctions(mockActiveAuctions);
+      setUpcomingAuctions(mockUpcomingAuctions);
+      return;
+    }
+
+    const loadAuctions = async () => {
+      try {
+        setErrorMessage('');
+        const [activeResponse, upcomingResponse] = await Promise.all([
+          fetch(`${API_BASE_URL}/auction?status=active`),
+          fetch(`${API_BASE_URL}/auction?status=upcoming`),
+        ]);
+
+        const activePayload = (await activeResponse.json()) as ApiAuctionListResponse;
+        const upcomingPayload = (await upcomingResponse.json()) as ApiAuctionListResponse;
+
+        if (!activeResponse.ok || !upcomingResponse.ok) {
+          throw new Error('Unable to load auctions.');
+        }
+
+        setActiveAuctions(activePayload.data.auctions.map(mapApiAuctionToItem));
+        setUpcomingAuctions(upcomingPayload.data.auctions.map(mapApiAuctionToItem));
+      } catch (error) {
+        console.error('Failed to load auctions', error);
+        setErrorMessage('Unable to load auctions right now.');
+      }
+    };
+
+    void loadAuctions();
+  }, [user, isMockSession]);
 
   const handleBid = (itemId: string) => {
     if (!user) return;
+    if (!isMockSession) {
+      const placeBid = async () => {
+        try {
+          const token = localStorage.getItem(TOKEN_STORAGE_KEY);
+          if (!token) return;
+
+          const response = await fetch(`${API_BASE_URL}/auction/${itemId}/bids`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ amount: 1 }),
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to place bid');
+          }
+
+          setActiveAuctions((prev) =>
+            prev.map((item) =>
+              item.id === itemId
+                ? {
+                    ...item,
+                    currentPrice: item.currentPrice + 1,
+                    lastBidder: user.username,
+                    bids: item.bids + 1,
+                  }
+                : item
+            )
+          );
+        } catch (error) {
+          console.error('Bid error', error);
+          setErrorMessage('Unable to place bid right now.');
+        }
+      };
+
+      void placeBid();
+      return;
+    }
 
     setActiveAuctions((prev) =>
       prev.map((item) =>
@@ -55,6 +164,12 @@ export const Home: React.FC = () => {
         </motion.div>
 
         {/* Live Auctions Grid */}
+        {errorMessage && (
+          <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3">
+            <p className="text-red-300 text-sm text-center">{errorMessage}</p>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 lg:gap-8">
           {activeAuctions.map((item, index) => (
             <motion.div

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { LogIn, UserPlus } from 'lucide-react';
+import { Eye, EyeOff, LogIn, UserPlus } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useNavigate } from 'react-router-dom';
@@ -13,9 +13,15 @@ export const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage('');
+    setIsSubmitting(true);
+
     try {
       if (isRegister) {
         await register(username, email, password);
@@ -25,6 +31,9 @@ export const Login: React.FC = () => {
       navigate('/');
     } catch (error) {
       console.error('Auth error:', error);
+      setErrorMessage(error instanceof Error ? error.message : 'Authentication failed.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -116,23 +125,40 @@ export const Login: React.FC = () => {
               <label className="block text-xs md:text-sm font-bold text-gray-300 mb-2">
                 {t('auth.password')}
               </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3 md:px-4 py-2.5 md:py-3 bg-black/40 border border-purple-500/30 rounded-lg text-white text-sm md:text-base focus:outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20 transition-all"
-                required
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full px-3 md:px-4 py-2.5 md:py-3 pr-11 bg-black/40 border border-purple-500/30 rounded-lg text-white text-sm md:text-base focus:outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20 transition-all"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute inset-y-0 right-0 px-3 text-gray-400 hover:text-white transition-colors"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
             </div>
 
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               type="submit"
+              disabled={isSubmitting}
               className="w-full bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 text-white font-black text-base md:text-lg py-3 md:py-4 rounded-lg md:rounded-xl shadow-[0_0_30px_rgba(236,72,153,0.5)] hover:shadow-[0_0_40px_rgba(236,72,153,0.8)] transition-all uppercase"
             >
-              {isRegister ? t('auth.createAccount') : t('auth.login')}
+              {isSubmitting ? '...' : isRegister ? t('auth.createAccount') : t('auth.login')}
             </motion.button>
+
+            {errorMessage && (
+              <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
+                <p className="text-sm text-red-300 text-center">{errorMessage}</p>
+              </div>
+            )}
           </form>
 
           {/* Demo hint */}

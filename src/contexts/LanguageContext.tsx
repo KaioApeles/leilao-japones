@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 type Language = 'en' | 'pt' | 'ja';
+const LANGUAGE_STORAGE_KEY = 'site_language';
 
 interface Translations {
   [key: string]: {
@@ -84,6 +85,7 @@ const translations: Translations = {
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
+  applyLocale: (locale?: string | null) => void;
   t: (key: string) => string;
 }
 
@@ -97,15 +99,43 @@ export const useLanguage = () => {
   return context;
 };
 
+const normalizeLocaleToLanguage = (locale?: string | null): Language | null => {
+  if (!locale) return null;
+  const normalized = locale.toLowerCase();
+  if (normalized.startsWith('pt')) return 'pt';
+  if (normalized.startsWith('ja')) return 'ja';
+  if (normalized.startsWith('en')) return 'en';
+  return null;
+};
+
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [language, setLanguage] = useState<Language>('en');
+  const [language, setLanguageState] = useState<Language>(() => {
+    const savedLanguage = localStorage.getItem(LANGUAGE_STORAGE_KEY);
+    if (savedLanguage === 'en' || savedLanguage === 'pt' || savedLanguage === 'ja') {
+      return savedLanguage;
+    }
+
+    const browserLanguage = normalizeLocaleToLanguage(navigator.language);
+    return browserLanguage ?? 'en';
+  });
+
+  const setLanguage = (lang: Language) => {
+    setLanguageState(lang);
+    localStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
+  };
+
+  const applyLocale = (locale?: string | null) => {
+    const languageFromLocale = normalizeLocaleToLanguage(locale);
+    if (!languageFromLocale) return;
+    setLanguage(languageFromLocale);
+  };
 
   const t = (key: string): string => {
     return translations[key]?.[language] || key;
   };
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+    <LanguageContext.Provider value={{ language, setLanguage, applyLocale, t }}>
       {children}
     </LanguageContext.Provider>
   );

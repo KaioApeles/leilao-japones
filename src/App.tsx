@@ -12,17 +12,31 @@ import { Admin } from './pages/Admin';
 import { Rankings } from './pages/Rankings';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user } = useAuth();
+  const { user, isAuthReady } = useAuth();
+
+  if (!isAuthReady) {
+    return null;
+  }
+
   return user ? <>{children}</> : <Navigate to="/login" />;
 };
 
 const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user } = useAuth();
+  const { user, isAuthReady } = useAuth();
+
+  if (!isAuthReady) {
+    return null;
+  }
+
   return user && user.isAdmin ? <>{children}</> : <Navigate to="/" />;
 };
 
 function AppContent() {
-  const { user } = useAuth();
+  const { user, isAuthReady } = useAuth();
+
+  if (!isAuthReady) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-black">
@@ -85,11 +99,11 @@ function AppContent() {
 export default function App() {
   return (
     <Router>
-      <AuthProvider>
-        <LanguageProvider>
+      <LanguageProvider>
+        <AuthProvider>
           <AppContent />
-        </LanguageProvider>
-      </AuthProvider>
+        </AuthProvider>
+      </LanguageProvider>
     </Router>
   );
 }

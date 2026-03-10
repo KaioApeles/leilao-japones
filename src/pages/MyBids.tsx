@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Trophy, Clock, XCircle, TrendingUp } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -14,12 +14,22 @@ interface BidItem {
   timeLeft?: string;
 }
 
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3003/api/v1.0';
+const TOKEN_STORAGE_KEY = 'auth_token';
+
+interface ApiMyBidsResponse {
+  ok: true;
+  data: {
+    activeBids: BidItem[];
+    endedBids: BidItem[];
+  };
+}
+
 export const MyBids: React.FC = () => {
   const { t } = useLanguage();
-  const { user } = useAuth();
+  const { user, isMockSession } = useAuth();
 
-  // Mock data
-  const activeBids: BidItem[] = [
+  const mockActiveBids: BidItem[] = [
     {
       id: '1',
       name: 'PlayStation 5 Console',
@@ -40,7 +50,7 @@ export const MyBids: React.FC = () => {
     },
   ];
 
-  const endedBids: BidItem[] = [
+  const mockEndedBids: BidItem[] = [
     {
       id: '7',
       name: 'Smart Watch Pro',
@@ -58,6 +68,47 @@ export const MyBids: React.FC = () => {
       status: 'lost',
     },
   ];
+
+  const [activeBids, setActiveBids] = useState<BidItem[]>(mockActiveBids);
+  const [endedBids, setEndedBids] = useState<BidItem[]>(mockEndedBids);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  useEffect(() => {
+    if (!user) return;
+    if (isMockSession) {
+      setActiveBids(mockActiveBids);
+      setEndedBids(mockEndedBids);
+      return;
+    }
+
+    const loadMyBids = async () => {
+      try {
+        setErrorMessage('');
+        const token = localStorage.getItem(TOKEN_STORAGE_KEY);
+        if (!token) return;
+
+        const response = await fetch(`${API_BASE_URL}/user/me/bids`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const payload = (await response.json()) as ApiMyBidsResponse;
+
+        if (!response.ok) {
+          throw new Error('Unable to load your bids.');
+        }
+
+        setActiveBids(payload.data.activeBids);
+        setEndedBids(payload.data.endedBids);
+      } catch (error) {
+        console.error('Failed to load my bids', error);
+        setErrorMessage('Unable to load your bids right now.');
+      }
+    };
+
+    void loadMyBids();
+  }, [user, isMockSession]);
 
   if (!user) {
     return (
@@ -83,6 +134,12 @@ export const MyBids: React.FC = () => {
         </motion.div>
 
         {/* Active Bids */}
+        {errorMessage && (
+          <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3">
+            <p className="text-red-300 text-sm text-center">{errorMessage}</p>
+          </div>
+        )}
+
         <section className="space-y-6">
           <h2 className="text-3xl font-black text-white flex items-center gap-3">
             <Clock className="w-8 h-8 text-pink-500" />
