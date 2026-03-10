@@ -11,7 +11,7 @@ export const Settings: React.FC = () => {
   if (!user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-black via-purple-900/20 to-black flex items-center justify-center">
-        <p className="text-white text-xl">Please login to access settings</p>
+        <p className="text-white text-xl">{t('settings.loginRequired')}</p>
       </div>
     );
   }
@@ -58,9 +58,9 @@ export const Settings: React.FC = () => {
             </div>
 
             <div className="bg-black/40 rounded-lg p-4 border border-purple-500/20">
-              <label className="text-sm text-gray-400 uppercase tracking-wider">Account Type</label>
+              <label className="text-sm text-gray-400 uppercase tracking-wider">{t('settings.accountType')}</label>
               <div className="flex items-center gap-2 mt-1">
-                <p className="text-xl font-bold text-white">{user.isAdmin ? 'Administrator' : 'User'}</p>
+                <p className="text-xl font-bold text-white">{user.isAdmin ? t('settings.accountTypeAdmin') : t('settings.accountTypeUser')}</p>
                 {user.isAdmin && (
                   <span className="bg-yellow-500/20 border border-yellow-500 px-2 py-1 rounded text-xs font-bold text-yellow-400">
                     ADMIN
@@ -116,14 +116,14 @@ export const Settings: React.FC = () => {
         >
           <div className="flex items-center gap-3 mb-6">
             <SettingsIcon className="w-8 h-8 text-blue-500" />
-            <h2 className="text-3xl font-black text-white">Preferences</h2>
+            <h2 className="text-3xl font-black text-white">{t('settings.preferences')}</h2>
           </div>
 
           <div className="space-y-4">
             <div className="flex items-center justify-between bg-black/40 rounded-lg p-4 border border-purple-500/20">
               <div>
-                <p className="font-bold text-white">Email Notifications</p>
-                <p className="text-sm text-gray-400">Receive updates about your bids</p>
+                <p className="font-bold text-white">{t('settings.emailNotifications')}</p>
+                <p className="text-sm text-gray-400">{t('settings.emailNotificationsDesc')}</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" className="sr-only peer" defaultChecked />
@@ -133,8 +133,8 @@ export const Settings: React.FC = () => {
 
             <div className="flex items-center justify-between bg-black/40 rounded-lg p-4 border border-purple-500/20">
               <div>
-                <p className="font-bold text-white">Sound Effects</p>
-                <p className="text-sm text-gray-400">Play sounds for bids and wins</p>
+                <p className="font-bold text-white">{t('settings.soundEffects')}</p>
+                <p className="text-sm text-gray-400">{t('settings.soundEffectsDesc')}</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" className="sr-only peer" defaultChecked />

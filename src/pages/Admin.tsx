@@ -117,18 +117,18 @@ export const Admin: React.FC = () => {
         );
       } catch (error) {
         console.error('Failed to load auctions', error);
-        setErrorMessage('Unable to load auctions right now.');
+        setErrorMessage(t('admin.loadError'));
         setItems([]);
       }
     };
 
     void loadAuctions();
-  }, [user, isMockSession]);
+  }, [user, isMockSession, t]);
 
   if (!user || !user.isAdmin) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-black via-purple-900/20 to-black flex items-center justify-center">
-        <p className="text-white text-xl">Admin access required</p>
+        <p className="text-white text-xl">{t('admin.accessRequired')}</p>
       </div>
     );
   }
@@ -155,7 +155,7 @@ export const Admin: React.FC = () => {
       };
       setItems([...items, newItem]);
       setFormData({ name: '', description: '', imageUrl: '', startTime: null });
-      setSuccessMessage('Item created successfully!');
+      setSuccessMessage(t('admin.mockCreateSuccess'));
       setIsSubmitting(false);
       return;
     }
@@ -203,10 +203,10 @@ export const Admin: React.FC = () => {
 
       setItems((prev) => [createdItem, ...prev]);
       setFormData({ name: '', description: '', imageUrl: '', startTime: null });
-      setSuccessMessage('Auction created successfully!');
+      setSuccessMessage(t('admin.createSuccess'));
     } catch (error) {
       console.error('Create auction error', error);
-      setErrorMessage(error instanceof Error ? error.message : 'Unable to create auction right now.');
+      setErrorMessage(error instanceof Error ? error.message : t('admin.createError'));
     } finally {
       setIsSubmitting(false);
     }
@@ -249,7 +249,7 @@ export const Admin: React.FC = () => {
       ));
     } catch (error) {
       console.error('Update auction status error', error);
-      setErrorMessage(error instanceof Error ? error.message : 'Unable to update auction status right now.');
+      setErrorMessage(error instanceof Error ? error.message : t('admin.updateError'));
     }
   };
 
@@ -281,7 +281,7 @@ export const Admin: React.FC = () => {
       setItems((prev) => prev.filter(item => item.id !== id));
     } catch (error) {
       console.error('Delete auction error', error);
-      setErrorMessage(error instanceof Error ? error.message : 'Unable to delete auction right now.');
+      setErrorMessage(error instanceof Error ? error.message : t('admin.deleteError'));
     }
   };
 
@@ -297,7 +297,7 @@ export const Admin: React.FC = () => {
           <h1 className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 via-pink-500 to-purple-500">
             {t('admin.dashboard')}
           </h1>
-          <p className="text-gray-400">Manage auction items and monitor activity</p>
+          <p className="text-gray-400">{t('admin.subtitle')}</p>
         </motion.div>
 
         {/* Tabs */}
@@ -380,14 +380,14 @@ export const Admin: React.FC = () => {
                   value={formData.imageUrl}
                   onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
                   className="w-full px-4 py-3 bg-black/40 border border-purple-500/30 rounded-lg text-white focus:outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20"
-                  placeholder="https://example.com/image.jpg"
+                  placeholder={t('admin.imageUrl')}
                   required
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-bold text-gray-300 mb-2">
-                  {t('admin.startTime')} (Optional - leave blank for immediate)
+                  {t('admin.startTime')} ({t('admin.startTimeHint')})
                 </label>
                 <DatePicker
                   selected={formData.startTime}
@@ -395,7 +395,7 @@ export const Admin: React.FC = () => {
                   showTimeSelect
                   timeIntervals={15}
                   dateFormat="Pp"
-                  placeholderText="Select date and time"
+                  placeholderText={t('admin.selectDateTime')}
                   className="w-full px-4 py-3 bg-black/40 border border-purple-500/30 rounded-lg text-white focus:outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20"
                 />
               </div>
@@ -407,7 +407,7 @@ export const Admin: React.FC = () => {
                 disabled={isSubmitting}
                 className="w-full bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 text-white font-black text-lg py-4 rounded-xl shadow-[0_0_30px_rgba(236,72,153,0.5)] uppercase"
               >
-                {isSubmitting ? '...' : t('admin.create')}
+                {isSubmitting ? t('common.loading') : t('admin.create')}
               </motion.button>
             </form>
           </motion.div>
@@ -437,10 +437,10 @@ export const Admin: React.FC = () => {
                 <table className="w-full">
                   <thead className="bg-black/40 border-b border-purple-500/30">
                     <tr>
-                      <th className="px-6 py-4 text-left text-sm font-bold text-gray-300 uppercase">Item</th>
+                      <th className="px-6 py-4 text-left text-sm font-bold text-gray-300 uppercase">{t('admin.itemHeader')}</th>
                       <th className="px-6 py-4 text-left text-sm font-bold text-gray-300 uppercase">{t('admin.status')}</th>
-                      <th className="px-6 py-4 text-left text-sm font-bold text-gray-300 uppercase">Price</th>
-                      <th className="px-6 py-4 text-left text-sm font-bold text-gray-300 uppercase">Bids</th>
+                      <th className="px-6 py-4 text-left text-sm font-bold text-gray-300 uppercase">{t('admin.priceHeader')}</th>
+                      <th className="px-6 py-4 text-left text-sm font-bold text-gray-300 uppercase">{t('admin.bidsHeader')}</th>
                       <th className="px-6 py-4 text-left text-sm font-bold text-gray-300 uppercase">{t('admin.actions')}</th>
                     </tr>
                   </thead>
@@ -464,7 +464,7 @@ export const Admin: React.FC = () => {
                               ? 'bg-blue-500/20 text-blue-400 border border-blue-500'
                               : 'bg-red-500/20 text-red-400 border border-red-500'
                           }`}>
-                            {item.status}
+                            {item.status === 'active' ? t('admin.statusActive') : item.status === 'upcoming' ? t('admin.statusUpcoming') : t('admin.statusEnded')}
                           </span>
                         </td>
                         <td className="px-6 py-4">
@@ -481,7 +481,7 @@ export const Admin: React.FC = () => {
                                 whileTap={{ scale: 0.9 }}
                                 onClick={() => handleToggleAuctionStatus(item.id, item.status)}
                                 className="p-2 bg-red-500/20 rounded-lg border border-red-500/30 hover:bg-red-500/30"
-                                title={item.status === 'active' ? 'Pause Auction' : 'Resume Auction'}
+                                title={item.status === 'active' ? t('admin.pauseAuction') : t('admin.resumeAuction')}
                               >
                                 {item.status === 'active' ? (
                                   <Pause className="w-4 h-4 text-red-400" />
@@ -495,7 +495,7 @@ export const Admin: React.FC = () => {
                               whileTap={{ scale: 0.9 }}
                               onClick={() => handleDeleteItem(item.id)}
                               className="p-2 bg-gray-500/20 rounded-lg border border-gray-500/30 hover:bg-gray-500/30"
-                              title="Delete"
+                              title={t('admin.delete')}
                             >
                               <Trash2 className="w-4 h-4 text-gray-400" />
                             </motion.button>

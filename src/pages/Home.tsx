@@ -76,12 +76,12 @@ export const Home: React.FC = () => {
         setUpcomingAuctions(upcomingPayload.data.auctions.map(mapApiAuctionToItem));
       } catch (error) {
         console.error('Failed to load auctions', error);
-        setErrorMessage('Unable to load auctions right now.');
+        setErrorMessage(t('home.loadError'));
       }
     };
 
     void loadAuctions();
-  }, [user, isMockSession]);
+  }, [user, isMockSession, t]);
 
   const handleBid = (itemId: string) => {
     if (!user) return;
@@ -118,7 +118,7 @@ export const Home: React.FC = () => {
           );
         } catch (error) {
           console.error('Bid error', error);
-          setErrorMessage('Unable to place bid right now.');
+          setErrorMessage(t('home.bidError'));
         }
       };
 
@@ -160,7 +160,7 @@ export const Home: React.FC = () => {
           <h2 className="text-3xl md:text-4xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500">
             {t('home.liveAuctions')}
           </h2>
-          <p className="text-gray-400 text-sm md:text-lg">Every bid starts at 1¥ • Each bid adds 1¥</p>
+          <p className="text-gray-400 text-sm md:text-lg">{t('home.subtitle')}</p>
         </motion.div>
 
         {/* Live Auctions Grid */}
@@ -220,10 +220,9 @@ export const Home: React.FC = () => {
           transition={{ delay: 0.5 }}
           className="bg-gradient-to-r from-purple-900/40 to-pink-900/40 rounded-xl md:rounded-2xl p-4 md:p-8 border border-purple-500/30 text-center"
         >
-          <h3 className="text-lg md:text-2xl font-black text-white mb-1 md:mb-2">How it works</h3>
+          <h3 className="text-lg md:text-2xl font-black text-white mb-1 md:mb-2">{t('home.howItWorksTitle')}</h3>
           <p className="text-gray-300 text-sm md:text-base">
-            Each auction starts at 1¥. Every bid increases the price by 1¥ and costs you 1 credit. 
-            The last bidder when the timer runs out wins the item at the final price!
+            {t('home.howItWorksDesc')}
           </p>
         </motion.div>
       </div>

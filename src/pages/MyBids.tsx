@@ -103,17 +103,17 @@ export const MyBids: React.FC = () => {
         setEndedBids(payload.data.endedBids);
       } catch (error) {
         console.error('Failed to load my bids', error);
-        setErrorMessage('Unable to load your bids right now.');
+        setErrorMessage(t('myBids.loadError'));
       }
     };
 
     void loadMyBids();
-  }, [user, isMockSession]);
+  }, [user, isMockSession, t]);
 
   if (!user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-black via-purple-900/20 to-black flex items-center justify-center">
-        <p className="text-white text-xl">Please login to view your bids</p>
+        <p className="text-white text-xl">{t('myBids.loginRequired')}</p>
       </div>
     );
   }
@@ -130,7 +130,7 @@ export const MyBids: React.FC = () => {
           <h1 className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500">
             {t('myBids.title')}
           </h1>
-          <p className="text-gray-400">Track all your auction activity</p>
+          <p className="text-gray-400">{t('myBids.subtitle')}</p>
         </motion.div>
 
         {/* Active Bids */}
@@ -199,7 +199,7 @@ const BidCard: React.FC<{ bid: BidItem }> = ({ bid }) => {
         return (
           <div className="flex items-center gap-2 bg-blue-500/20 border border-blue-500 px-3 py-1 rounded-full">
             <Clock className="w-4 h-4 text-blue-400" />
-            <span className="text-blue-400 font-bold text-sm">Active</span>
+            <span className="text-blue-400 font-bold text-sm">{t('myBids.statusActive')}</span>
           </div>
         );
     }
@@ -228,13 +228,13 @@ const BidCard: React.FC<{ bid: BidItem }> = ({ bid }) => {
 
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-black/40 rounded-lg p-3 border border-purple-500/20">
-            <p className="text-xs text-gray-400 uppercase">Current Price</p>
+            <p className="text-xs text-gray-400 uppercase">{t('myBids.currentPrice')}</p>
             <p className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-pink-500">
               {bid.currentPrice} ¥
             </p>
           </div>
           <div className="bg-black/40 rounded-lg p-3 border border-purple-500/20">
-            <p className="text-xs text-gray-400 uppercase">My Bids</p>
+            <p className="text-xs text-gray-400 uppercase">{t('myBids.myBidsLabel')}</p>
             <p className="text-2xl font-black text-purple-400">{bid.myBids}</p>
           </div>
         </div>

@@ -27,7 +27,7 @@ export const Header: React.FC = () => {
             <h1 className="text-2xl md:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500">
               ⚡ BIDガチャ
             </h1>
-            <p className="text-[10px] md:text-xs text-gray-400 uppercase tracking-widest">Penny Auction</p>
+            <p className="text-[10px] md:text-xs text-gray-400 uppercase tracking-widest">{t('auth.tagline')}</p>
           </motion.div>
 
           {/* Desktop Navigation */}
@@ -99,7 +99,7 @@ export const Header: React.FC = () => {
                 <div className="bg-gradient-to-r from-yellow-500/20 to-pink-500/20 px-2 md:px-4 py-1.5 md:py-2 rounded-full border-2 border-yellow-400/50 flex items-center gap-1 md:gap-2">
                   <Zap className="w-4 h-4 md:w-5 md:h-5 text-yellow-400" />
                   <span className="font-black text-white text-sm md:text-base">{user.credits}</span>
-                  <span className="text-[10px] md:text-xs text-gray-300 hidden sm:inline">credits</span>
+                  <span className="text-[10px] md:text-xs text-gray-300 hidden sm:inline">{t('common.credits')}</span>
                 </div>
 
                 {/* User menu - Desktop */}
@@ -243,7 +243,7 @@ export const Header: React.FC = () => {
               className="w-full flex items-center justify-center gap-2 bg-red-500/20 px-4 py-3 rounded-lg border border-red-500/30 text-red-400 font-bold"
             >
               <LogOut className="w-5 h-5" />
-              <span>Logout</span>
+              <span>{t('nav.logout')}</span>
             </motion.button>
           </motion.div>
         )}

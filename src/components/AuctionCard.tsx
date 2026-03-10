@@ -37,11 +37,11 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ item, onBid }) => {
 
   const handleBid = () => {
     if (!user) {
-      alert('Please login to bid');
+      alert(t('common.loginRequiredToBid'));
       return;
     }
     if (user.credits < 1) {
-      alert('Not enough credits!');
+      alert(t('common.notEnoughCredits'));
       return;
     }
     onBid(item.id);

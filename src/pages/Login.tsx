@@ -31,7 +31,7 @@ export const Login: React.FC = () => {
       navigate('/');
     } catch (error) {
       console.error('Auth error:', error);
-      setErrorMessage(error instanceof Error ? error.message : 'Authentication failed.');
+      setErrorMessage(error instanceof Error ? error.message : t('auth.authFailed'));
     } finally {
       setIsSubmitting(false);
     }
@@ -56,7 +56,7 @@ export const Login: React.FC = () => {
             <h1 className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 mb-2">
               ⚡ BIDガチャ
             </h1>
-            <p className="text-gray-400 uppercase tracking-widest text-xs md:text-sm">Penny Auction</p>
+            <p className="text-gray-400 uppercase tracking-widest text-xs md:text-sm">{t('auth.tagline')}</p>
           </div>
 
           {/* Tabs */}
@@ -72,7 +72,7 @@ export const Login: React.FC = () => {
               <div className="flex items-center justify-center gap-2">
                 <LogIn className="w-4 h-4 md:w-5 md:h-5" />
                 <span className="hidden sm:inline">{t('auth.login')}</span>
-                <span className="sm:hidden">Login</span>
+                <span className="sm:hidden">{t('auth.login')}</span>
               </div>
             </button>
             <button
@@ -86,7 +86,7 @@ export const Login: React.FC = () => {
               <div className="flex items-center justify-center gap-2">
                 <UserPlus className="w-4 h-4 md:w-5 md:h-5" />
                 <span className="hidden sm:inline">{t('auth.register')}</span>
-                <span className="sm:hidden">Register</span>
+                <span className="sm:hidden">{t('auth.register')}</span>
               </div>
             </button>
           </div>
@@ -137,7 +137,7 @@ export const Login: React.FC = () => {
                   type="button"
                   onClick={() => setShowPassword((prev) => !prev)}
                   className="absolute inset-y-0 right-0 px-3 text-gray-400 hover:text-white transition-colors"
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  aria-label={showPassword ? t('auth.hidePassword') : t('auth.showPassword')}
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
@@ -164,7 +164,7 @@ export const Login: React.FC = () => {
           {/* Demo hint */}
           <div className="mt-4 md:mt-6 p-3 md:p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
             <p className="text-xs md:text-sm text-gray-300 text-center">
-              <span className="font-bold text-blue-400">Demo:</span> Use admin@admin.com / admin for admin access
+              <span className="font-bold text-blue-400">{t('auth.demoLabel')}</span> {t('auth.demoHint')}
             </p>
           </div>
         </div>

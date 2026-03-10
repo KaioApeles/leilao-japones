@@ -38,6 +38,7 @@ interface UserPayload {
   email: string;
   name: string;
   admin?: boolean;
+  credits?: number;
   userConfigs?: Array<{
     locale?: string;
   }>;
@@ -61,7 +62,7 @@ const mapApiUserToAuthUser = (apiUser: UserPayload): User => ({
   id: apiUser.uuid,
   username: apiUser.name,
   email: apiUser.email,
-  credits: 0,
+  credits: apiUser.credits ?? 1000,
   isAdmin: Boolean(apiUser.admin),
 });
 

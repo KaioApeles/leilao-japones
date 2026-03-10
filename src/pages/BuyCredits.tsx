@@ -40,13 +40,16 @@ export const BuyCredits: React.FC = () => {
   const handlePurchase = (pack: CreditPack) => {
     const totalCredits = pack.credits + (pack.bonus || 0);
     updateCredits(totalCredits);
-    alert(`Successfully purchased ${totalCredits} credits!`);
+    alert(
+      t('credits.purchaseSuccess')
+        .replace('{{count}}', String(totalCredits))
+    );
   };
 
   if (!user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-black via-purple-900/20 to-black flex items-center justify-center">
-        <p className="text-white text-xl">Please login to buy credits</p>
+        <p className="text-white text-xl">{t('credits.loginRequired')}</p>
       </div>
     );
   }
@@ -69,7 +72,7 @@ export const BuyCredits: React.FC = () => {
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 via-pink-500 to-purple-500">
             {t('credits.title')}
           </h1>
-          <p className="text-gray-400 text-sm md:text-base">Get more bids to win amazing items!</p>
+          <p className="text-gray-400 text-sm md:text-base">{t('credits.subtitle')}</p>
         </motion.div>
 
         {/* Current Credits */}
@@ -105,7 +108,7 @@ export const BuyCredits: React.FC = () => {
                 <div className="absolute -top-3 md:-top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-yellow-500 to-orange-500 px-4 md:px-6 py-1.5 md:py-2 rounded-full">
                   <span className="text-black font-black text-xs md:text-sm uppercase flex items-center gap-1">
                     <Sparkles className="w-3 h-3 md:w-4 md:h-4" />
-                    Popular
+                    {t('credits.popular')}
                   </span>
                 </div>
               )}
@@ -123,10 +126,10 @@ export const BuyCredits: React.FC = () => {
                   <div className="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-pink-500">
                     {pack.credits}
                   </div>
-                  <p className="text-gray-400 mt-2 uppercase tracking-wider text-xs md:text-sm">Credits</p>
+                  <p className="text-gray-400 mt-2 uppercase tracking-wider text-xs md:text-sm">{t('credits.label')}</p>
                   {pack.bonus && (
                     <div className="mt-2 inline-block bg-green-500/20 border border-green-500 px-2 md:px-3 py-1 rounded-full">
-                      <span className="text-green-400 font-bold text-xs md:text-sm">+{pack.bonus} Bonus!</span>
+                      <span className="text-green-400 font-bold text-xs md:text-sm">+{pack.bonus} {t('credits.bonus')}</span>
                     </div>
                   )}
                 </div>
@@ -166,8 +169,7 @@ export const BuyCredits: React.FC = () => {
           className="max-w-2xl mx-auto bg-blue-500/10 border border-blue-500/30 rounded-lg md:rounded-xl p-4 md:p-6 text-center"
         >
           <p className="text-gray-300 text-sm md:text-base">
-            <span className="font-bold text-blue-400">Note:</span> This is a demo. In production, 
-            this would integrate with a real payment processor.
+            <span className="font-bold text-blue-400">{t('credits.noteTitle')}</span> {t('credits.noteDesc')}
           </p>
         </motion.div>
       </div>

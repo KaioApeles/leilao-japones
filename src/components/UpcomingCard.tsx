@@ -19,7 +19,7 @@ export const UpcomingCard: React.FC<UpcomingCardProps> = ({ item }) => {
       const distance = start - now;
 
       if (distance < 0) {
-        setStartsIn('Starting soon...');
+        setStartsIn(t('common.startingSoon'));
         clearInterval(timer);
       } else {
         const hours = Math.floor(distance / (1000 * 60 * 60));
@@ -29,7 +29,7 @@ export const UpcomingCard: React.FC<UpcomingCardProps> = ({ item }) => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [item.endTime]);
+  }, [item.endTime, t]);
 
   return (
     <motion.div
@@ -53,7 +53,7 @@ export const UpcomingCard: React.FC<UpcomingCardProps> = ({ item }) => {
           
           {/* Coming soon badge */}
           <div className="absolute top-2 right-2 bg-blue-500 px-2 md:px-3 py-1 rounded-full">
-            <span className="text-[10px] md:text-xs font-bold text-white uppercase">Coming Soon</span>
+            <span className="text-[10px] md:text-xs font-bold text-white uppercase">{t('common.comingSoon')}</span>
           </div>
         </div>
 
@@ -68,7 +68,7 @@ export const UpcomingCard: React.FC<UpcomingCardProps> = ({ item }) => {
         </div>
 
         <div className="text-center pt-2 border-t border-blue-500/20">
-          <p className="text-xs md:text-sm text-gray-400">Starting at</p>
+          <p className="text-xs md:text-sm text-gray-400">{t('common.startingAt')}</p>
           <p className="text-xl md:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-blue-400">
             1 ¥
           </p>
